@@ -2,6 +2,8 @@ import {AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild} from '@a
 import * as THREE from 'three';
 import {CSS2DRenderer} from 'three/examples/jsm/renderers/CSS2DRenderer';
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls';
+import {NURBSSurface} from 'three/examples/jsm/curves/NURBSSurface';
+import {ParametricGeometry} from 'three';
 
 @Component({
   selector: 'app-cube',
@@ -36,7 +38,8 @@ export class CubeComponent implements OnInit, AfterViewInit {
   private geometry = new THREE.TorusKnotGeometry(50, 10);
   private material = new THREE.MeshPhongMaterial({color: '#047cf4', emissive: '#0458f4'});
   // private material = new THREE.MeshBasicMaterial({map: this.loader.load(this.texture)});
-  private cube: THREE.Mesh = new THREE.Mesh(this.geometry, this.material);
+  // private cube: THREE.Mesh = new THREE.Mesh(this.geometry, this.material);
+  private cube = new THREE.Group();
   
   private renderer!: THREE.WebGLRenderer;
   private scene!: THREE.Scene;
@@ -46,10 +49,59 @@ export class CubeComponent implements OnInit, AfterViewInit {
     this.cube.rotation.y += this.rotationSpeedY;
   }
   
+  init() {
+    const nsControlPoints = [
+      [
+        new THREE.Vector3( - 200, - 200, 100 ),
+        new THREE.Vector3( - 200, - 100, - 200),
+        new THREE.Vector3( - 200, 100, 250),
+        new THREE.Vector3( - 200, 200, - 100)
+      ],
+      [
+        new THREE.Vector3( 0, - 200, 0),
+        new THREE.Vector3( 0, - 100, - 100),
+        new THREE.Vector3( 0, 100, 150),
+        new THREE.Vector3( 0, 200, 0)
+      ],
+      [
+        new THREE.Vector3( 200, - 200, - 100),
+        new THREE.Vector3( 200, - 100, 200),
+        new THREE.Vector3( 200, 100, - 250),
+        new THREE.Vector3( 200, 200, 100)
+      ],
+      // [
+      //   new THREE.Vector3( 100, - 100, - 200),
+      //   new THREE.Vector3( 100, - 200, 100),
+      //   new THREE.Vector3( 100, 200, - 150),
+      //   new THREE.Vector3( 100, 100, 200)
+      // ]
+    ];
+    const degree1 = 2;
+    const degree2 = 3;
+    const knots1 = [ 0, 0, 0, 1, 1, 1 ];
+    const knots2 = [ 0, 0, 0, 0, 1, 1, 1, 1 ];
+    const nurbsSurface = new NURBSSurface( degree1, degree2, knots1, knots2, nsControlPoints );
+    
+    // const map = new THREE.TextureLoader().load( 'textures/uv_grid_opengl.jpg' );
+    // map.wrapS = map.wrapT = THREE.RepeatWrapping;
+    // map.anisotropy = 16;
+    
+    function getSurfacePoint( u: number, v: number, target: THREE.Vector3 ) {
+      return nurbsSurface.getPoint( u, v, target );
+    }
+    
+    const geometry = new ParametricGeometry( getSurfacePoint, 20, 20 );
+    const material = new THREE.MeshLambertMaterial( { color: "#ff0000" } );
+    const object = new THREE.Mesh( geometry, material );
+    object.position.set( 0, 0, 0 );
+    object.scale.multiplyScalar( 1 );
+    this.cube.add( object );
+  }
+  
   private createScene() {
     //* Scene
     this.scene = new THREE.Scene();
-    this.scene.background = new THREE.Color('#fff');
+    this.scene.background = new THREE.Color('#a9a9a9');
     this.light.position.set(200, 50, 200);
     this.scene.add(this.light);
     this.scene.add(this.cube);
@@ -91,8 +143,6 @@ export class CubeComponent implements OnInit, AfterViewInit {
   }
   
   private startRenderingLoop() {
-    //* Renderer
-    // Use canvas element in template
     this.renderer = new THREE.WebGLRenderer({canvas: this.canvas});
     this.renderer.setPixelRatio(devicePixelRatio);
     this.renderer.setSize(this.canvas.clientWidth, this.canvas.clientHeight);
@@ -112,6 +162,7 @@ export class CubeComponent implements OnInit, AfterViewInit {
   }
   
   ngAfterViewInit() {
+    this.init();
     this.createScene();
     this.startRenderingLoop();
     this.createControls();
