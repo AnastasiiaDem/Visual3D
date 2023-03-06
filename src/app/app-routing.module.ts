@@ -1,16 +1,16 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { CubeComponent } from './cube/cube.component';
-import { ModelComponent } from './model/model.component';
+import { Lab1Component } from './lab1/lab1.component';
+import {Lab2Component} from './lab2/lab2.component';
 
 const routes: Routes = [
   {
-    path: "",
-    component: CubeComponent
+    path: "lab1",
+    component: Lab1Component
   },
   {
-    path: "model",
-    component: ModelComponent
+    path: "lab2",
+    component: Lab2Component
   }
 ];
 

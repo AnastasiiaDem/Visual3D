@@ -1,0 +1,88 @@
+*, html {
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', sans-serif;
+  scroll-behavior: smooth;
+  color: #343a40;
+  overflow: hidden;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Inter', sans-serif;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  user-select: none;
+  min-height: 100vh;
+}
+
+.container {
+  display: flex;
+}
+
+#leftPanel {
+  padding: 2rem 0 0 4rem;
+}
+
+.tablink {
+  border: 1px solid rgba(169, 169, 169, 0.3);
+  border-radius: 5px;
+  padding: 2px 5px;
+  margin-bottom: 10px;
+}
+
+.point-legend {
+  font-weight: bold;
+}
+
+canvas {
+  width: 100% !important;
+}
+
+input {
+  border: 1px solid #aaa9be;
+  border-radius: 5px;
+  width: 50px;
+  padding: 2px 5px;
+  margin: 2px 0;
+}
+
+button {
+  border: 1px solid #6c757d;
+  border-radius: 5px;
+  width: 50px;
+  height: fit-content;
+  background: #e9ecef;
+  padding: 2px 5px;
+  margin: 2px 20px;
+  cursor: pointer;
+}
+
+p {
+  font-weight: 800;
+}
+
+.axis-x {
+  position: absolute;
+  font-size: 12px;
+  bottom: 6%;
+  left: 50.5%;
+  color: #ff2121;
+}
+
+.axis-y {
+  position: absolute;
+  font-size: 12px;
+  top: 62%;
+  right: 3%;
+  color: #1aff1a;
+}
+
+.axis-z {
+  position: absolute;
+  font-size: 12px;
+  left: 60.7%;
+  color: #2121ff;
+}

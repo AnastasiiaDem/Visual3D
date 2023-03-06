@@ -1,0 +1,126 @@
+<div class="container">
+  <div id="leftPanel" style="width: 20%;">
+    <div>
+      <p>ROTATION</p>
+      <div style="text-align: center; padding: 1rem;">
+        <div>
+          x
+          <input
+              type="number"
+              [(ngModel)]="xAngle"
+              (ngModelChange)="rotate()"
+              max="360.0"
+              min="-360.0"
+              step="1"
+              value="0"/>
+        </div>
+        <div>
+          y
+          <input
+              type="number"
+              [(ngModel)]="yAngle"
+              (ngModelChange)="rotate()"
+              max="360.0"
+              min="-360.0"
+              step="1"
+              value="0"/>
+        </div>
+        <div>
+          z
+          <input
+              type="number"
+              [(ngModel)]="zAngle"
+              (ngModelChange)="rotate()"
+              max="360.0"
+              min="-360.0"
+              step="1"
+              value="0"/>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top: 3rem;">
+      <p>MOVING</p>
+      <div style="text-align: center; padding: 1rem;">
+        <div>
+          x
+          <input
+              type="number"
+              [(ngModel)]="xPos"
+              (ngModelChange)="move()"
+              step="1"
+              value="0"/>
+        </div>
+        <div>
+          y
+          <input
+              type="number"
+              [(ngModel)]="yPos"
+              (ngModelChange)="move()"
+              step="1"
+              value="0"/>
+        </div>
+        <div>
+          z
+          <input
+              type="number"
+              [(ngModel)]="zPos"
+              (ngModelChange)="move()"
+              step="1"
+              value="0"/>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top: 3rem;">
+      <p>SCALE</p>
+      <div style="text-align: center; padding: 1rem;">
+        <div>
+          x
+          <input
+              type="number"
+              [(ngModel)]="xScale"
+              (ngModelChange)="scale()"
+              step="0.1"
+              value="1"/>
+        </div>
+        <div>
+          y
+          <input
+              type="number"
+              [(ngModel)]="yScale"
+              (ngModelChange)="scale()"
+              step="0.1"
+              value="1"/>
+        </div>
+        <div>
+          z
+          <input
+              type="number"
+              [(ngModel)]="zScale"
+              (ngModelChange)="scale()"
+              step="0.1"
+              value="1"/>
+        </div>
+      </div>
+    </div>
+    <!--    <div style="margin-top: 3rem;">-->
+    <!--      <p>CAMERA</p>-->
+    <!--      <div style="text-align: center; padding: 1rem;">-->
+    <!--          x-->
+    <!--          <input-->
+    <!--              type="range"-->
+    <!--              id="cameraAngleRange"-->
+    <!--              max="360"-->
+    <!--              min="0"-->
+    <!--              step="1"-->
+    <!--              value="75"-->
+    <!--          />-->
+    <!--      </div>-->
+    <!--    </div>-->
+  </div>
+  <div style="margin: 2rem;height: 500px;width: 80%;border: 2px solid rgba(52,58,64,0.1);border-radius: 10px;">
+    <p class="axis-x">x</p>
+    <p class="axis-y">y</p>
+    <p class="axis-z">z</p>
+    <canvas #canvas id="canvas" style="height: 100%; width: 100%;" ></canvas>
+  </div>
+</div>
