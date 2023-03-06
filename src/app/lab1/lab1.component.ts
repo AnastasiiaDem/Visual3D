@@ -1,6 +1,5 @@
 import {AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
 import * as THREE from 'three';
-import {Color} from 'three';
 import {CSS2DRenderer} from 'three/examples/jsm/renderers/CSS2DRenderer';
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls';
 
@@ -16,7 +15,6 @@ export class Lab1Component implements OnInit, AfterViewInit {
   @Input() public rotationSpeedX: number = 0.05;
   @Input() public rotationSpeedY: number = 0.01;
   @Input() public size: number = 200;
-  @Input() public texture: string = './assets/texture.jpg';
   @Input() public cameraZ: number = 400;
   @Input() public cameraY: number = 400;
   @Input() public cameraX: number = 400;
@@ -29,9 +27,6 @@ export class Lab1Component implements OnInit, AfterViewInit {
   }
   
   private controls: OrbitControls;
-  private axesHelper = new THREE.AxesHelper(600);
-  private light = new THREE.PointLight('#ffe945');
-  private cube = new THREE.Group();
   
   B00: any[] = [];
   B01: any[] = [];
@@ -101,13 +96,11 @@ export class Lab1Component implements OnInit, AfterViewInit {
   lineControl4: any[] = [];
   lineControl5: any[] = [];
   
-  private noDivisions = 10;
-  private step: any;
-  private material: THREE.MeshPhysicalMaterial;
-  private materialLine: THREE.LineBasicMaterial;
-  private uvArray: any[] = [];
-  private surfaceWire: any[] = [];
-  
+  noDivisions = 10;
+  step: any;
+  material: THREE.MeshPhongMaterial;
+  uvArray: any[] = [];
+  surfaceWire: any[] = [];
   lineWire: any[] = [];
   geometry: any[] = [];
   geometry1: any[] = [];
@@ -116,37 +109,55 @@ export class Lab1Component implements OnInit, AfterViewInit {
   geometry4: any[] = [];
   geometry5: any[] = [];
   array: any;
+  axes: THREE.AxesHelper;
   
   init() {
     this.initializeValues();
     this.createScene();
     
-    this.material = new THREE.MeshPhysicalMaterial({
+    this.material = new THREE.MeshPhongMaterial({
       side: THREE.DoubleSide,
-      color: '#a6b6e8',
-      emissive: '#3459ec',
-      transmission: 1,
-      opacity: 0.5,
-      metalness: 0,
-      roughness: 0,
-      ior: 2.333,
-      specularIntensity: 1,
-      transparent: true,
-    });
-    
-    this.material.thickness = 0.1;
-    this.material.specularTint = new Color('#fff');
-    
-    this.materialLine = new THREE.LineBasicMaterial({
-      color: 'rgb(65,65,65)',
-      linewidth: 20
+      color: 'rgba(102,102,114,0.61)',
+      wireframe: true
     });
     
     this.renderer.setClearColor(new THREE.Color('#fff'));
     this.renderer.setSize(window.innerWidth, window.innerHeight);
+  
+    let spotLight = new THREE.AmbientLight("#fff");
+    spotLight.position.set( 30, 30, 10 );
+    this.scene.add(spotLight);
     
-    let axes = new THREE.AxesHelper(1);
-    this.scene.add(axes);
+    this.handleCameraAngle();
+    this.computeBezierSurface();
+    
+    this.render();
+  }
+  
+  private createScene() {
+    //* Scene
+    this.scene = new THREE.Scene();
+    this.scene.background = new THREE.Color('#fff');
+    
+    //*Camera
+    let aspectRatio = this.getAspectRatio();
+    this.camera = new THREE.PerspectiveCamera(
+      this.fieldOfView,
+      aspectRatio,
+      this.nearClippingPlane,
+      this.farClippingPlane
+    );
+    // this.camera.position.z = this.cameraZ;
+    this.camera.up.set(0, 0, 1);
+    
+    // this.camera.position.y = this.cameraY;
+    // this.camera.position.x = this.cameraX;
+    this.camera.position.set(400, 100, 300);
+    
+    this.renderer = new THREE.WebGLRenderer({antialias: true});
+    
+    this.axes = new THREE.AxesHelper(1);
+    this.scene.add(this.axes);
     
     let origin = new THREE.Vector3(0, 0, 0);
     let xArrowPos = new THREE.Vector3(1, 0, 0);
@@ -185,40 +196,6 @@ export class Lab1Component implements OnInit, AfterViewInit {
       0.04
     );
     this.scene.add(this.arrowHelper3);
-    
-    this.handleCameraAngle();
-    this.computeBezierSurface();
-    
-    this.render();
-  }
-  
-  private createScene() {
-    //* Scene
-    this.scene = new THREE.Scene();
-    this.scene.background = new THREE.Color('#fff');
-    this.light.position.set(200, 50, 200);
-    this.scene.add(this.light);
-    this.scene.add(this.cube);
-    this.cube.translateOnAxis(new THREE.Vector3(0, 0, 0), 1);
-    this.scene.add(this.axesHelper);
-    
-    //*Camera
-    let aspectRatio = this.getAspectRatio();
-    this.camera = new THREE.PerspectiveCamera(
-      this.fieldOfView,
-      aspectRatio,
-      this.nearClippingPlane,
-      this.farClippingPlane
-    );
-    // this.camera.position.z = this.cameraZ;
-    this.camera.up.set(0, 0, 1);
-    
-    // this.camera.position.y = this.cameraY;
-    // this.camera.position.x = this.cameraX;
-    this.camera.position.set(400, 100, 300);
-    
-    this.renderer = new THREE.WebGLRenderer({antialias: true});
-    
   }
   
   private createControls = () => {
@@ -346,10 +323,14 @@ export class Lab1Component implements OnInit, AfterViewInit {
     );
     this.geometry[i].setIndex(indices);
     this.geometry[i].computeVertexNormals();
-
-    this.surfaceWire.push(new THREE.WireframeGeometry(this.geometry[i]));
-    this.lineWire.push(new THREE.LineSegments(this.surfaceWire[i], this.materialLine));
-    this.scene.add(this.surfaceWire[i]);
+    
+    // this.surfaceWire.push(new THREE.WireframeGeometry(this.geometry[i]));
+    // this.lineWire.push(new THREE.LineSegments(this.surfaceWire[i], this.materialLine));
+    // this.scene.add(this.surfaceWire[i]);
+    
+    this.lineWire.push(new THREE.Mesh(this.geometry[i], this.material));
+    this.lineWire[i].material.needsUpdate = true;
+    this.scene.add(this.lineWire[i]);
     
     this.render();
   }
@@ -488,31 +469,29 @@ export class Lab1Component implements OnInit, AfterViewInit {
     this.point33[i].position.y = this.B33[i][1];
     this.point33[i].position.z = this.B33[i][2];
     
-    // this.scene.add(this.point00[i]);
-    // this.scene.add(this.point01[i]);
-    // this.scene.add(this.point02[i]);
-    // this.scene.add(this.point03[i]);
+    // scene.add(this.point00[i]);
+    // scene.add(this.point01[i]);
+    // scene.add(this.point02[i]);
+    // scene.add(this.point03[i]);
     //
-    // this.scene.add(this.point10[i]);
-    // this.scene.add(this.point11[i]);
-    // this.scene.add(this.point12[i]);
-    // this.scene.add(this.point13[i]);
+    // scene.add(this.point10[i]);
+    // scene.add(this.point11[i]);
+    // scene.add(this.point12[i]);
+    // scene.add(this.point13[i]);
     //
-    // this.scene.add(this.point20[i]);
-    // this.scene.add(this.point21[i]);
-    // this.scene.add(this.point22[i]);
-    // this.scene.add(this.point23[i]);
+    // scene.add(this.point20[i]);
+    // scene.add(this.point21[i]);
+    // scene.add(this.point22[i]);
+    // scene.add(this.point23[i]);
     //
-    // this.scene.add(this.point30[i]);
-    // this.scene.add(this.point31[i]);
-    // this.scene.add(this.point32[i]);
-    // this.scene.add(this.point33[i]);
+    // scene.add(this.point30[i]);
+    // scene.add(this.point31[i]);
+    // scene.add(this.point32[i]);
+    // scene.add(this.point33[i]);
     
     let material = new THREE.LineBasicMaterial({
       color: '#ffff00',
-      linewidth: 20,
-      linecap: 'round',
-      linejoin: 'round',
+      opacity: 0.25,
       transparent: true,
     });
     

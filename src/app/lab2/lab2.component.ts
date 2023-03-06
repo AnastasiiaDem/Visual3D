@@ -104,10 +104,7 @@ export class Lab2Component implements OnInit, AfterViewInit {
   private noDivisions = 10;
   private step: any;
   private material: THREE.MeshPhysicalMaterial;
-  private materialLine: THREE.LineBasicMaterial;
   private uvArray: any[] = [];
-  private surfaceWire: any[] = [];
-  
   surfaceMesh: any[] = [];
   geometry: any[] = [];
   geometry1: any[] = [];
@@ -125,22 +122,18 @@ export class Lab2Component implements OnInit, AfterViewInit {
       side: THREE.DoubleSide,
       color: '#a6b6e8',
       emissive: '#3459ec',
-      transmission: 1,
-      opacity: 0.5,
+      opacity: 0.4,
       metalness: 0,
-      roughness: 0,
       ior: 2.333,
       specularIntensity: 1,
       transparent: true,
+      transmission: 1,
+      roughness: 0.07,
+      envMapIntensity: 1.5,
     });
   
-    this.material.thickness = 0.1;
+    this.material.thickness = 1.5;
     this.material.specularTint = new Color('#fff');
-  
-    this.materialLine = new THREE.LineBasicMaterial({
-      color: 'rgb(88,88,98)',
-      linewidth: 1
-    });
     
     this.renderer.setClearColor(new THREE.Color('#fff'));
     this.renderer.setSize(window.innerWidth, window.innerHeight);
@@ -185,10 +178,14 @@ export class Lab2Component implements OnInit, AfterViewInit {
       0.04
     );
     this.scene.add(this.arrowHelper3);
+  
+    let spotLight = new THREE.SpotLight("#fff");
+    spotLight.position.set( 30, 30, 10 );
+    this.scene.add(spotLight);
     
     this.handleCameraAngle();
     this.computeBezierSurface();
-    
+    this.move();
     this.render();
   }
   
